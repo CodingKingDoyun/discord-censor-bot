@@ -1,0 +1,72 @@
+import assert from 'node:assert/strict';
+import { resolve } from 'node:path';
+import { describe, it } from 'node:test';
+import { WordFilter } from '../src/filter.js';
+
+// 실제 배포되는 data/ 목록으로 검사한다. 목록을 수정하면 이 테스트로 오탐/미탐을 확인할 수 있다.
+const dataDir = resolve(import.meta.dirname, '../data');
+const filter = WordFilter.fromFiles(resolve(dataDir, 'banned-words.txt'), resolve(dataDir, 'allowed-words.txt'));
+const hits = (text) => filter.find(text).map(({ start, end }) => text.slice(start, end));
+
+describe('data/ 금지어 목록', () => {
+  it('정상 문장은 검열하지 않는다 (오탐 방지)', () => {
+    const cleanSentences = [
+      // 시발
+      '여기가 시발점이야', '시발역에서 만나자', '다시 발견했어', '오후 2시 발표 예정', '즉시 발효됩니다',
+      '도시 발전 계획', '동시 발생한 사건', '당시 발언이 문제였다', '역시 발상이 좋네', '임시 발급 받았어',
+      '다시 발라야 해', '다시 발목 잡혔다', '몇 시 발차야?', '감시 발각', '두 시 발렌타인 파티',
+      // 씨발/씨팔
+      '아저씨 발 냄새', '아저씨 발견!', '아가씨 발표 잘하네', '수박씨 발라 먹어', '아저씨 팔 아파', '아저씨 벌써 왔어',
+      '김씨 발언 들었어?', '박씨 팔았대', '이씨 벌금 냈대',
+      // 병신/등신
+      '병신년 새해', '병신춘문예 당선', '질병 신고 했어', '일병 신청서', '이등병 신입', '병 신선해', '상병 신분',
+      '등신대 세워놨다', '1등 신기록 달성', '1등 신청 완료', '1등 신발',
+      // 새끼
+      '새끼 고양이 귀엽다', '새끼손가락 걸고 약속', '새끼발가락 다쳤어', '새끼줄 꼬기', '강아지가 새끼를 낳았어',
+      // 개새
+      '사과 한 개 새로 샀어', '개 새우 튀김', '한 개 새벽에 왔어', '한 개 새거로 줘', '맘 충전 완료',
+      // 존나
+      '기존 나라들과 비교', '보존 나무', '생존 나이', '공존 나라',
+      // 일부러 제외한 단어 (미친, 시바, 조까, 졸라, 보지/자지, 새기, 개년, 운지, 내용)
+      '영향을 미친다', '시바견 키워', '다시 바꿔줘', '강조까지 했잖아', '엄마를 졸라서 샀어',
+      '그거 보지 마', '자지 말고 일어나', '마음에 새기다', '5개년 계획', '얼마나 어려운지 몰라', '기존 내용 수정',
+      // 일상 대화
+      '안녕하세요 반갑습니다', 'ㅋㅋㅋㅋ 개웃기네', '오늘 점심 뭐 먹지', '시험 망했다 ㅠㅠ', '내일 몇 시에 봐?',
+      // 영어
+      'push it to the limit', 'he is hit by a ball', 'it was hit hard', 'fire retardant', 'Hello world',
+    ];
+    const falsePositives = cleanSentences
+      .map((text) => ({ text, hits: hits(text) }))
+      .filter((r) => r.hits.length > 0);
+    assert.deepEqual(falsePositives, []);
+  });
+
+  it('욕설과 우회 표현을 감지한다', () => {
+    const cases = [
+      ['아 시발', ['시발']],
+      ['시 발 진짜', ['시 발']],
+      ['씨.발', ['씨.발']],
+      ['씨빨 뭐야', ['씨빨']],
+      ['ㅅㅂ ㅈㄴ 어렵네', ['ㅅㅂ', 'ㅈㄴ']],
+      ['이 병신아', ['병신']],
+      ['개새끼야', ['개새끼']],
+      ['이 새끼가', ['새끼']],
+      ['존나 웃기네', ['존나']],
+      ['지랄하지마', ['지랄']],
+      ['좆같네', ['좆']],
+      ['느금마', ['느금마']],
+      ['틀딱 꺼져', ['틀딱']],
+      ['tlqkf 진짜', ['tlqkf']],
+      ['F u C k', ['F u C k']],
+      ['bullshit', ['shit']],
+      ['what the fuck shit', ['fuck', 'shit']],
+      // 허용어와 금지어가 함께 있어도 금지어는 감지
+      ['시발점에서 시발', ['시발']],
+      ['다시 시발', ['시발']],
+      ['새끼 고양이 같은 새끼', ['새끼']],
+    ];
+    for (const [text, expected] of cases) {
+      assert.deepEqual(hits(text), expected, `"${text}"`);
+    }
+  });
+});
