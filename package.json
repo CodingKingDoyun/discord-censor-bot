@@ -1,0 +1,17 @@
+{
+  "name": "discord-censor-bot",
+  "version": "1.0.0",
+  "description": "부적절한 단어를 감지해 메시지를 검열하고, 금지어를 강조해 다시 보여주는 디스코드 봇",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test"
+  },
+  "dependencies": {
+    "discord.js": "^14.27.0"
+  }
+}

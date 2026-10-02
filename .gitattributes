@@ -1,0 +1,2 @@
+# Windows 에서 커밋해도 Termux(리눅스)에서 스크립트가 깨지지 않도록 LF 로 고정
+* text=auto eol=lf
