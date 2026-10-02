@@ -26,23 +26,6 @@
 ```
 <sub>🚫 부적절한 표현 1건이 감지되어 검열되었습니다 · 누적 3회</sub>
 
-## 🔄 동작 흐름
-
-```mermaid
-flowchart TD
-    A[메시지 작성 / 수정] --> B{봇·웹훅 메시지?}
-    B -- 예 --> Z[무시]
-    B -- 아니오 --> C[정규화 후 금지어 검색<br/>공백·특수문자 제거, 소문자화]
-    C --> D{금지어 발견?<br/>허용어 범위 제외}
-    D -- 없음 --> Z
-    D -- 있음 --> E[첨부파일 미리 다운로드]
-    E --> F[원본 메시지 삭제]
-    F --> G[검열 횟수 += 매칭 개수<br/>SQLite UPSERT]
-    G --> H["금지어를 빨간색 + [ ] 로 강조<br/>ANSI 코드 블록"]
-    H --> K[웹훅으로 작성자 이름·프사로 재전송]
-    K -. 웹훅 권한 없음 .-> L[봇 계정으로 재전송]
-```
-
 ## 🛠 기술 스택
 
 - **Node.js 22.13+** (ESM)
@@ -121,7 +104,7 @@ flowchart TD
 ### 2. 로컬에서 실행 (Windows)
 
 ```bash
-git clone https://github.com/<your-id>/discord-censor-bot.git
+git clone https://github.com/CodingKingDoyun/discord-censor-bot.git
 cd discord-censor-bot
 npm install
 copy .env.example .env    # PowerShell/CMD. Git Bash 라면 cp
@@ -138,7 +121,7 @@ npm start
 ```bash
 pkg update && pkg upgrade
 pkg install nodejs git tmux termux-api
-git clone https://github.com/<your-id>/discord-censor-bot.git
+git clone https://github.com/CodingKingDoyun/discord-censor-bot.git
 cd discord-censor-bot
 npm install
 cp .env.example .env && nano .env
