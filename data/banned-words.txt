@@ -16,6 +16,13 @@
 씨빨
 씨팔
 씨벌
+시벌
+씨밸
+시밸
+씨뱔
+시빨
+시뻘
+씨뻘
 씨부랄
 씹새끼
 씹새
@@ -105,6 +112,19 @@ qudtls
 rotorl
 whssk
 wlfkf
+
+# ── 로마자 표기 우회 ──
+sibal
+ssibal
+shibal
+sival
+ssival
+shival
+sibbal
+byungsin
+byeongsin
+gaesaekki
+gaesaeki
 
 # ── 영어 ──
 fuck
